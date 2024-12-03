@@ -3,6 +3,8 @@
 ## 프로젝트 소개
 이 프로젝트는 Sparse Autoencoder를 사용하여 언어 모델(LLM)의 잠재 특징들을 분석하고 시각화하는 도구입니다. TF-IDF(Term Frequency-Inverse Document Frequency) 기반의 시각화 방법을 통해 모델이 학습한 특징들을 직관적으로 이해할 수 있도록 합니다. 특히 한국어 텍스트에 특화된 특징 추출과 분석을 제공합니다.
 
+Sparse Autocoder from https://github.com/ai-safety-foundation/sparse_autoencoder Undder MIT License
+
 ## 주요 기능
 - Sparse Autoencoder를 통한 LLM 특징 추출
   - 대규모 언어 모델의 중간 레이어에서 의미있는 특징 추출
