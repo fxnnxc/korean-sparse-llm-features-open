@@ -39,12 +39,12 @@ parser.add_argument("--layer_quantile", type=str, default="q1")
 parser.add_argument("--total_steps", type=int, default=100000)
 args = parser.parse_args()
 
-path = f"{base_path}/outputs/sae/{args.sae}/{args.lm_name}_{args.lm_size}_{args.split}_{args.lang}_{args.layer_quantile}"
+path = f"{base_path}/sae/gated/outputs/{args.lm_name}_{args.lm_size}_{args.split}_{args.lang}_{args.layer_quantile}"
 os.makedirs(path, exist_ok=True)
 
 activations = pickle.load(
     open(
-        f"{base_path}/outputs/sae/{args.sae}/{args.lm_name}_{args.lm_size}_{args.split}_{args.lang}.pkl",
+        f"{base_path}/outputs/activations_{args.lm_name}_{args.lm_size}_{args.split}_{args.lang}.pkl",
         "rb",
     )
 )
