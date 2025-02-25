@@ -11,7 +11,10 @@ from abc import (
 )
 
 
-__all__ = ['AutoEncoder', 'StandardTrainer']
+__all__ = [
+    'AutoEncoder',
+    'StandardTrainer',
+]
 
 
 class Dictionary(ABC, nn.Module):

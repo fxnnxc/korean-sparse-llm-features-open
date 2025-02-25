@@ -11,16 +11,20 @@ base_path = Path(__file__).absolute().parent.parent
 sys.path.append(base_path.__str__())
 sys.path.append(f"{base_path.__str__()}/lib/")
 
-from lib.utils.dataloader import get_dataloder_from_dataset
-from lib.util.fetch import MultipleFetch
-from lib.util.load_model import get_exaone
-from lib.data.keat_small.load_data import load_keat_small
+from lib.utils.data import get_dataloder_from_dataset
+from lib.utils.fetch import MultipleFetch
+from lib.utils.load_model import get_exaone
 from lib.utils.tokenize import get_tokenized_dataset
+from lib.datasets.keat_small import get_keat_small_dataset
+
+
+PROJECT_ROOT = Path(__file__).parent.parent
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--lm_name", type=str, default="exaone")
 parser.add_argument("--lm_size", type=str, default="8b")
-parser.add_argument("--lm_cache_dir", type=str, default="/data1/bumjin/datahub")
+parser.add_argument("--lm_cache_dir", type=str, default=PROJECT_ROOT / 'cache')
 parser.add_argument("--device_map", type=str, default="auto")
 parser.add_argument("--batch_size", type=int, default=4)
 parser.add_argument("--split", type=str, default="train")
@@ -89,9 +93,8 @@ fetch = MultipleFetch(dict_format)
 # =========================================================
 
 
-path = "/data1/bumjin/nlp_data/datahub/MRL-2021/dataset/keat"
 if flags.data == "keat":
-    datadict, json_data = load_keat_small(path)
+    datadict, json_data = get_keat_small_dataset()
     dataset_raw = datadict["train"]
 else:
     raise ValueError(f"Unknown dataset {flags.data}")

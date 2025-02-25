@@ -7,7 +7,10 @@ import torch.nn as nn
 from collections import namedtuple
 
 
-__all__ = ['GatedAutoEncoder', 'GatedTrainer']
+__all__ = [
+    'GatedAutoEncoder',
+    'GatedTrainer',
+]
 
 
 class ConstrainedAdam(torch.optim.Adam):

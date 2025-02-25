@@ -2,6 +2,11 @@ from torch.utils.data import DataLoader
 from transformers import default_data_collator
 
 
+__all__ = [
+    'get_dataloder_from_dataset',
+]
+
+
 def get_dataloder_from_dataset(dataset, batch_size, shuffle=False):
     dataloader = DataLoader(
         dataset,

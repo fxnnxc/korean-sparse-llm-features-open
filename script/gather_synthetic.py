@@ -9,9 +9,10 @@ base_path = Path(__file__).absolute().parent.parent
 sys.path.append(base_path.__str__())
 sys.path.append(f"{base_path.__str__()}/lib/")
 
-from lib.utils.dataloader import get_dataloder_from_dataset
-from lib.util.fetch import MultipleFetch
-from lib.util.load_model import get_exaone
+from lib.utils.data import get_dataloder_from_dataset
+from lib.utils.fetch import MultipleFetch
+from lib.utils.load_model import get_exaone
+from lib.datasets.synthetic import get_synthetic_dataset
 
 
 parser = argparse.ArgumentParser()
@@ -74,10 +75,9 @@ dict_format = {
     },
 }
 fetch = MultipleFetch(dict_format)
-from lib.data.custom_data import create_custom_dataset
 
 
-dataset = create_custom_dataset()
+dataset = get_synthetic_dataset()
 window_size = 10
 max_length = 128
 

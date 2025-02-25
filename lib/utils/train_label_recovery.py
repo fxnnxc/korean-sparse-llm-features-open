@@ -6,9 +6,9 @@ import torch
 import numpy as np
 from tqdm import tqdm
 
-from lib.model.standard_sae import AutoEncoder
-from lib.model.gated_sae import GatedAutoEncoder
-from lib.data.custom_data import create_custom_dataset
+from lib.models.standard_sae import AutoEncoder
+from lib.models.gated_sae import GatedAutoEncoder
+from lib.datasets.synthetic import get_synthetic_dataset
 
 parser = argparse.ArgumentParser()
 
@@ -16,7 +16,7 @@ parser.add_argument("--sae", type=str, default="gated")
 parser.add_argument("--q", type=int, default=2)
 args = parser.parse_args()
 
-custom_data = create_custom_dataset()
+custom_data = get_synthetic_dataset()
 with open("outputs/activations_exaone_8b_train_synthetic.pkl", "rb") as f:
     activations = pickle.load(f)
 big_categories = list(

@@ -1,34 +1,32 @@
+__all__ = [
+    'GeneralFetch',
+    'MultipleFetch',
+]
+
+
 class GeneralFetch:
+
     def __init__(self, module, condition_fn, fetch_fn):
         self.module = module
         self.condition_fn = condition_fn
         self.fetch_fn = fetch_fn
         self.can_fetch = True
         self.is_hook_registered = False
-
         self.register_hook()
 
     def get_fetch_hook(self):
         def fetch_hook(module, input, output):
             if self.can_fetch and self.condition_fn(module, input, output):
-                return self.fetch_fn(
-                    module,
-                    input,
-                    output,
-                )
+                return self.fetch_fn(module, input, output)
             else:
                 return output
-
         return fetch_hook
 
     def register_hook(self, warn=True):
         if self.is_hook_registered:
             if warn:
-                print(
-                    "Warning: Hook is already registered, we remove the existing hook"
-                )
+                print("Warning: Hook is already registered, we remove the existing hook")
             self.remove_hook()
-
         self.fetch_hook = self.module.register_forward_hook(self.get_fetch_hook())
         self.is_hook_registered = True
 
@@ -46,6 +44,7 @@ class GeneralFetch:
 
 
 class MultipleFetch:
+
     def __init__(self, dict_format):
         self.fetches = {
             #  "mlp": {
@@ -60,9 +59,7 @@ class MultipleFetch:
             #  }
         }
         for key, value in dict_format.items():
-            fetch = GeneralFetch(
-                value["module"], value["condition_fn"], value["fetch_fn"]
-            )
+            fetch = GeneralFetch(value["module"], value["condition_fn"], value["fetch_fn"])
             self.fetches[key] = fetch
 
     def activate(self, key=None):
