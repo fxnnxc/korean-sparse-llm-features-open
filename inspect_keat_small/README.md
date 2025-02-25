@@ -1,8 +1,6 @@
 # Keat Small
 
-```bash
-git clone https://github.com/emorynlp/MRL-2021
-```
+See `inspect.ipynb`.
 
 ## Text Lengths
 

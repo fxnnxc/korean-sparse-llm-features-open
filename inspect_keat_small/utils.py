@@ -137,11 +137,14 @@ def visualize_text_lengths(split2textdataset: Dict[str, Dataset], figsize=(12, 4
     # Add statistics annotation
     stats_text = []
     for split, lengths in lengths_by_split.items():
+        percentiles = np.percentile(lengths, [25, 50, 75])
         stats = (
             f'{split}:\n'
             f'  Count: {len(lengths)}\n'
-            f'  Mean: {np.mean(lengths):.1f}\n'
-            f'  Median: {np.median(lengths):.1f}\n'
+            f'  Mean: {np.mean(lengths):.2f}\n'
+            f'  25th %ile: {percentiles[0]:.2f}\n'
+            f'  50th %ile: {percentiles[1]:.2f}\n'
+            f'  75th %ile: {percentiles[2]:.2f}\n'
             f'  Min: {min(lengths)}\n'
             f'  Max: {max(lengths)}'
         )
