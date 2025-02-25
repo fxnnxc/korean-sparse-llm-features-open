@@ -1,4 +1,3 @@
-import os
 import json
 
 import numpy as np
@@ -6,7 +5,6 @@ import seaborn as sns
 import datasets
 import matplotlib.pyplot as plt
 from scipy.stats import gaussian_kde
-from scipy.interpolate import make_interp_spline
 
 from typing import Dict
 from datasets import Dataset
@@ -51,12 +49,12 @@ def load_keat_small(data_dir: Path):
     return dataset, json_data
 
 
-def visualize_text_lengths(text_dict: Dict[str, Dataset], figsize=(12, 4), bins=30):
+def visualize_text_lengths(split2textdataset: Dict[str, Dataset], figsize=(12, 4), bins=30):
     """
     Creates a histogram with smoothed KDE line of text lengths from a dictionary of datasets.
 
     Args:
-        text_dict (Dict[str, Dataset]): Dictionary of splits containing text datasets
+        split2textdataset (Dict[str, Dataset]): Dictionary of splits containing text datasets
             e.g., {'train': dataset['text'], 'test': dataset['text']}
         figsize (tuple): Figure size (width, height)
         bins (int): Number of bins for histogram
@@ -66,7 +64,7 @@ def visualize_text_lengths(text_dict: Dict[str, Dataset], figsize=(12, 4), bins=
     """
     # Calculate text lengths for each split
     lengths_by_split = {}
-    for split, texts in text_dict.items():
+    for split, texts in split2textdataset.items():
         # Calculate character lengths
         lengths_by_split[split] = [len(str(text)) for text in texts]
 
