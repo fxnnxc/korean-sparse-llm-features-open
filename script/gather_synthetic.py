@@ -9,7 +9,7 @@ base_path = Path(__file__).absolute().parent.parent
 sys.path.append(base_path.__str__())
 sys.path.append(f"{base_path.__str__()}/lib/")
 
-from lib.data.dataloader import get_dataloder_from_dataset
+from lib.utils.dataloader import get_dataloder_from_dataset
 from lib.util.fetch import MultipleFetch
 from lib.util.load_model import get_exaone
 
