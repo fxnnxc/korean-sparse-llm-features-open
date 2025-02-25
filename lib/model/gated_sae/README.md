@@ -1,4 +1,4 @@
-# Gated SAE + Annealing Norm P 
+# Gated SAE + Annealing Norm P
 
 This is a gated SAE with an annealing norm p.
 

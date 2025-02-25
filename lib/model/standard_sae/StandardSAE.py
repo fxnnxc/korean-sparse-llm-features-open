@@ -1,7 +1,6 @@
 """
 Implements the standard SAE training scheme.
 """
-
 import torch
 import torch.nn as nn
 
@@ -12,7 +11,7 @@ from abc import (
 )
 
 
-__all__ = ['StandardTrainer']
+__all__ = ['AutoEncoder', 'StandardTrainer']
 
 
 class Dictionary(ABC, nn.Module):
@@ -55,6 +54,7 @@ class AutoEncoder(Dictionary, nn.Module):
         self.dict_size = dict_size
         self.bias = nn.Parameter(torch.zeros(activation_dim))
         self.encoder = nn.Linear(activation_dim, dict_size, bias=True)
+        # self.encoder = nn.Linear(activation_dim, dict_size, bias=False)  # (possible fix)
 
         # rows of decoder weight matrix are unit vectors
         self.decoder = nn.Linear(dict_size, activation_dim, bias=False)
@@ -204,8 +204,8 @@ class StandardTrainer():
 
             # dead 뉴런 재초기화
             sampled_vecs_normalized = sampled_vecs / sampled_vecs.norm(dim=-1, keepdim=True)
-            self.ae.encoder.weight[deads] = sampled_vecs_normalized * alive_norm * 0.2  # [n_dead, activation_dim]
-            # self.ae.encoder.weight[deads] = sampled_vecs * alive_norm * 0.2  # [n_dead, activation_dim]
+            # self.ae.encoder.weight[deads] = sampled_vecs_normalized * alive_norm * 0.2  # [n_dead, activation_dim]  (possible fix)
+            self.ae.encoder.weight[deads] = sampled_vecs * alive_norm * 0.2  # [n_dead, activation_dim]
             self.ae.decoder.weight[:,deads] = sampled_vecs_normalized.T  # [activation_dim, n_dead]
             self.ae.encoder.bias[deads] = 0.
 
