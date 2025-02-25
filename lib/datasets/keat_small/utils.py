@@ -22,9 +22,9 @@ from scipy.stats import gaussian_kde
 PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
 
 
-def load_keat_small():
+def get_keat_small_dataset():
     """
-    Load KEAT small dataset.
+    Get KEAT small dataset, while downloading and extracting the dataset if it is not already downloaded.
     """
 
     data = {
@@ -71,14 +71,16 @@ def download_and_extract_mrl():
     # check if the dataset is already downloaded
     dev_data_exists = False
     try:
-        data = json.load(open(final_dir / 'dataset/keat/development.json'))
+        with open(final_dir / 'dataset/keat/development.json') as fpi:
+            data = json.load(fpi)
         if len(data) == 700:
             dev_data_exists = True
     except:
         pass
     eval_data_exists = False
     try:
-        data = json.load(open(final_dir / 'dataset/keat/evaluation.json'))
+        with open(final_dir / 'dataset/keat/evaluation.json') as fpi:
+            data = json.load(fpi)
         if len(data) == 700:
             eval_data_exists = True
     except:

@@ -162,5 +162,5 @@ cython_debug/
 
 # Project
 outputs/
-MRL-2021/
-*.otf
+cache/
+downloads/

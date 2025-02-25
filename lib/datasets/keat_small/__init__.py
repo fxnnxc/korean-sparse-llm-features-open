@@ -1,3 +1,3 @@
-from .utils import load_keat_small
+from .utils import get_keat_small_dataset
 
-__all__ = ['load_keat_small']
+__all__ = ['get_keat_small_dataset']

@@ -1,7 +1,4 @@
-import datasets
-
-
-data = {
+SYNTH_SEED = {
     "음식": {
         "templates": [
             "나는 어제 특별한 날이라 {symbol} 먹었다.",
@@ -393,26 +390,3 @@ data = {
         ],
     },
 }
-
-
-def create_custom_dataset():
-    # Create dataset from the data dictionary
-    processed_data = []
-
-    for big_category, content in data.items():
-        templates = content["templates"]
-        categories = content["categories"]
-
-        # Create all combinations of templates and categories
-        for template in templates:
-            for small_category in categories:
-                ko_text = template.replace("{symbol}", small_category)
-                processed_data.append(
-                    {
-                        "big_category": big_category,
-                        "small_category": small_category,
-                        "ko_text": ko_text,
-                    }
-                )
-
-    return datasets.Dataset.from_list(processed_data)
