@@ -7,6 +7,9 @@ from pathlib import Path
 from .seed import SYNTH_SEED
 
 
+__all__ = ['get_synthetic_dataset']
+
+
 PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
 
 

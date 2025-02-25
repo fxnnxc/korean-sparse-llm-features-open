@@ -19,6 +19,9 @@ from datasets import Dataset
 from scipy.stats import gaussian_kde
 
 
+__all__ = ['get_keat_small_dataset']
+
+
 PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
 
 
