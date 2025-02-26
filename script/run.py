@@ -13,8 +13,14 @@ base_path = Path(__file__).absolute().parent.parent
 sys.path.append(base_path.__str__())
 sys.path.append(f"{base_path.__str__()}/lib/")
 
-from lib.model.standard_sae import StandardTrainer, AutoEncoder
-from lib.model.gated_sae import GatedTrainer, GatedAutoEncoder
+from lib.models.standard_sae import (
+    StandardTrainer,
+    AutoEncoder,
+)
+from lib.models.gated_sae import (
+    GatedTrainer,
+    GatedAutoEncoder,
+)
 
 
 class CustomDataset(torch.utils.data.Dataset):

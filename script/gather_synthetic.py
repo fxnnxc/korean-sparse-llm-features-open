@@ -15,10 +15,13 @@ from lib.utils.load_model import get_exaone
 from lib.datasets.synthetic import get_synthetic_dataset
 
 
+PROJECT_ROOT = Path(__file__).parent.parent
+
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--lm_name", type=str, default="exaone")
 parser.add_argument("--lm_size", type=str, default="8b")
-parser.add_argument("--lm_cache_dir", type=str, default="/data1/bumjin/datahub")
+parser.add_argument("--lm_cache_dir", type=str, default=PROJECT_ROOT / 'cache')
 parser.add_argument("--device_map", type=str, default="auto")
 parser.add_argument("--batch_size", type=int, default=4)
 parser.add_argument("--split", type=str, default="train")
