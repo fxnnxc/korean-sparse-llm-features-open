@@ -13,11 +13,11 @@ PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.append(str(PROJECT_ROOT))
 sys.path.append(str(PROJECT_ROOT / 'lib'))
 
-from lib.utils.data import get_dataloder_from_dataset
-from lib.utils.fetch import MultipleFetch
-from lib.utils.model import get_exaone
-from lib.utils.tokenize import get_tokenized_dataset
-from lib.datasets.keat import get_keat_dataset
+from lib.utils.data import get_dataloder_from_dataset  # noqa
+from lib.utils.fetch import MultipleFetch  # noqa
+from lib.utils.model import get_exaone  # noqa
+from lib.utils.tokenize import get_tokenized_dataset  # noqa
+from lib.datasets.keat import get_keat_dataset  # noqa
 
 
 def get_flags():
@@ -93,7 +93,6 @@ def main(flags):
         },
     }
     _ = MultipleFetch(dict_format)
-
 
     # prepare dataset
     dataset, _ = get_keat_dataset()
@@ -172,7 +171,7 @@ def main(flags):
                 )
 
     # save activations
-    print(f"Saving activations...")
+    print("Saving activations...")
     output_dir = PROJECT_ROOT / flags.output_dir
     output_dir.mkdir(parents=True, exist_ok=True)
     for lang in ('en', 'ko'):

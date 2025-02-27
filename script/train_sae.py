@@ -19,11 +19,11 @@ PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.append(str(PROJECT_ROOT))
 sys.path.append(str(PROJECT_ROOT / 'lib'))
 
-from lib.models.standard_sae import (
+from lib.models.standard_sae import (  # noqa
     StandardTrainer,
     AutoEncoder,
 )
-from lib.models.gated_sae import (
+from lib.models.gated_sae import (  # noqa
     GatedTrainer,
     GatedAutoEncoder,
 )

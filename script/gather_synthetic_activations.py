@@ -14,10 +14,10 @@ PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.append(str(PROJECT_ROOT))
 sys.path.append(str(PROJECT_ROOT / 'lib'))
 
-from lib.utils.data import get_dataloder_from_dataset
-from lib.utils.fetch import MultipleFetch
-from lib.utils.model import get_exaone
-from lib.datasets.synthetic import get_synthetic_dataset
+from lib.utils.data import get_dataloder_from_dataset  # noqa
+from lib.utils.fetch import MultipleFetch  # noqa
+from lib.utils.model import get_exaone  # noqa
+from lib.datasets.synthetic import get_synthetic_dataset  # noqa
 
 
 def get_flags():
@@ -51,7 +51,7 @@ def estimate_token_location(text, target, tokenizer, window_size=10, max_length=
     tokens = tokenizer.encode(text, return_tensors='pt', padding='max_length', max_length=max_length)[0]
     loc = None
     for t in range(1, len(tokens)):
-        decoded = tokenizer.decode(tokens[max(0, t - window_size) : t])
+        decoded = tokenizer.decode(tokens[max(0, t - window_size): t])
         if target in decoded:
             loc = t
             break
@@ -170,7 +170,7 @@ def main(flags):
             )
 
     # save activations
-    print(f"Saving activations...")
+    print("Saving activations...")
     output_dir = PROJECT_ROOT / flags.output_dir
     output_dir.mkdir(parents=True, exist_ok=True)
     selected_activations = {
