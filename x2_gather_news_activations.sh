@@ -9,6 +9,7 @@ LM_CACHE_DIR="cache"
 DEVICE_MAP="auto"
 OUTPUT_DIR="outputs"
 BATCH_SIZE=4
+SPLIT="train"
 
 python script/gather_news_activations.py \
         --dataset news \
@@ -19,3 +20,4 @@ python script/gather_news_activations.py \
         --device_map "$DEVICE_MAP" \
         --output_dir "$OUTPUT_DIR" \
         --batch_size "$BATCH_SIZE" \
+        --split "$SPLIT"

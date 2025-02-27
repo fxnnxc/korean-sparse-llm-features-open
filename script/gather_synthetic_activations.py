@@ -1,4 +1,3 @@
-import os
 import sys
 import pickle
 import argparse
@@ -82,10 +81,9 @@ def get_dataset(tokenizer, flags):
     return dataset
 
 
-def main():
+def main(flags):
 
     # init
-    flags = get_flags()
     name = flags.dataset
     llm, tokenizer = get_exaone(  # TODO: what about other LLMs?
         lm_size=flags.lm_size,
@@ -100,8 +98,6 @@ def main():
         f'{name}_residual_q2': [],
         f'{name}_residual_q3': [],
     }
-    # print(activations)
-    # return
 
     # register hooks
     num_layers = llm.config.num_layers
@@ -117,7 +113,7 @@ def main():
             'fetch_fn': fetch_fn,
         },
         'residual_q2': {
-            'module': llm.transformer.h[num_layers // 2],
+            'module': llm.transformer.h[int(num_layers * 0.5)],
             'condition_fn': condition_fn,
             'fetch_fn': fetch_fn,
         },
@@ -175,14 +171,14 @@ def main():
 
     # save activations
     print(f"Saving activations...")
+    output_dir = PROJECT_ROOT / flags.output_dir
+    output_dir.mkdir(parents=True, exist_ok=True)
     selected_activations = {
         f'{name}_input_ids': torch.stack(activations[f'{name}_input_ids']),
         f'{name}_residual_q1': torch.stack(activations[f'{name}_residual_q1']),
         f'{name}_residual_q2': torch.stack(activations[f'{name}_residual_q2']),
         f'{name}_residual_q3': torch.stack(activations[f'{name}_residual_q3']),
     }
-    output_dir = PROJECT_ROOT / flags.output_dir
-    output_dir.mkdir(parents=True, exist_ok=True)
     with open(output_dir / f'activations_{flags.lm_name}_{flags.lm_size}_{name}.pkl', 'wb') as fpi:
         pickle.dump(selected_activations, fpi, protocol=pickle.HIGHEST_PROTOCOL)
 
@@ -190,4 +186,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    flags = get_flags()
+    main(flags)
