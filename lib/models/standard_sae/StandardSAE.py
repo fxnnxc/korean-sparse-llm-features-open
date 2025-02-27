@@ -21,8 +21,8 @@ class Dictionary(ABC, nn.Module):
     """
     A dictionary consists of a collection of vectors, an encoder, and a decoder.
     """
-    dict_size : int # number of features in the dictionary
-    activation_dim : int # dimension of the activation vectors
+    dict_size: int  # number of features in the dictionary
+    activation_dim: int  # dimension of the activation vectors
 
     @abstractmethod
     def encode(self, x):
@@ -57,7 +57,7 @@ class AutoEncoder(Dictionary, nn.Module):
         self.dict_size = dict_size
         self.bias = nn.Parameter(torch.zeros(activation_dim))
         self.encoder = nn.Linear(activation_dim, dict_size, bias=True)
-        # self.encoder = nn.Linear(activation_dim, dict_size, bias=False)  # (possible fix)
+        # self.encoder = nn.Linear(activation_dim, dict_size, bias=False)  # (TODO: possible fix)
 
         # rows of decoder weight matrix are unit vectors
         self.decoder = nn.Linear(dict_size, activation_dim, bias=False)
@@ -78,7 +78,7 @@ class AutoEncoder(Dictionary, nn.Module):
         output_features : if True, return the encoded features as well as the decoded x
         ghost_mask : if not None, run this autoencoder in "ghost mode" where features are masked
         """
-        if ghost_mask is None: # normal mode
+        if ghost_mask is None:  # normal mode
             f = self.encode(x)
             x_hat = self.decode(f)
             if output_features:
@@ -86,12 +86,12 @@ class AutoEncoder(Dictionary, nn.Module):
             else:
                 return x_hat
 
-        else: # ghost mode
+        else:  # ghost mode
             f_pre = self.encoder(x - self.bias)
             f_ghost = torch.exp(f_pre) * ghost_mask.to(f_pre)
             f = nn.ReLU()(f_pre)
 
-            x_ghost = self.decoder(f_ghost) # note that this only applies the decoder weight matrix, no bias
+            x_ghost = self.decoder(f_ghost)  # note that this only applies the decoder weight matrix, no bias
             x_hat = self.decode(f)
             if output_features:
                 return x_hat, x_ghost, f
@@ -124,13 +124,11 @@ class ConstrainedAdam(torch.optim.Adam):
         with torch.no_grad():
             for p in self.constrained_params:
                 normed_p = p / p.norm(dim=0, keepdim=True)
-                # project away the parallel component of the gradient
-                p.grad -= (p.grad * normed_p).sum(dim=0, keepdim=True) * normed_p
+                p.grad -= (p.grad * normed_p).sum(dim=0, keepdim=True) * normed_p  # project away the parallel component of the gradient
         super().step(closure=closure)
         with torch.no_grad():
             for p in self.constrained_params:
-                # renormalize the constrained parameters
-                p /= p.norm(dim=0, keepdim=True)
+                p /= p.norm(dim=0, keepdim=True)  # renormalize the constrained parameters
 
 
 class StandardTrainer():
@@ -140,21 +138,20 @@ class StandardTrainer():
     def __init__(self,
                  dict_class=AutoEncoder,
                  activation_dim=512,
-                 dict_size=64*512,
+                 dict_size=64 * 512,
                  lr=1e-3,
                  l1_penalty=1e-1,
-                 warmup_steps=1000, # lr warmup period at start of training and after each resample
+                 warmup_steps=1000,  # lr warmup period at start of training and after each resample
                  device='cpu',
-                 resample_steps=None, # how often to resample neurons
-    ):
+                 resample_steps=None,  # how often to resample neurons
+                 ):
         super().__init__()
-
 
         # initialize dictionary
         self.ae = dict_class(activation_dim, dict_size)
 
         self.lr = lr
-        self.l1_penalty=l1_penalty
+        self.l1_penalty = l1_penalty
         self.warmup_steps = warmup_steps
 
         self.device = device
@@ -182,7 +179,9 @@ class StandardTrainer():
         # self.ae.encoder.weight: [activation_dim, dict_size]
         # self.ae.decoder.weight: [dict_size, activation_dim]
         with torch.no_grad():
-            if deads.sum() == 0: return
+            if deads.sum() == 0:
+                return
+
             print(f"resampling {deads.sum().item()} neurons")
 
             # 각 뉴런의 평균 activation 크기 계산
@@ -193,13 +192,13 @@ class StandardTrainer():
             threshold = torch.quantile(mean_activation, 0.1)  # 하위 10% 뉴런 선택
             deads = mean_activation < threshold  # [dict_size] (boolean tensor)
 
-            if deads.sum() == 0: return
+            if deads.sum() == 0:
+                return
 
             # 높은 재구성 오차를 가진 입력 샘플 선택
             losses = (activations - self.ae(activations)).norm(dim=-1)  # [batch_size]
-            n_resample = min([deads.sum(), losses.shape[0]])
+            n_resample = min(deads.sum(), losses.shape[0])  # batch_size
             indices = torch.multinomial(losses, num_samples=n_resample, replacement=False)  # [n_resample]
-            # 여기서 n_resample = min(deads.sum(), batch_size)
             sampled_vecs = activations[indices]  # [n_resample, activation_dim]
 
             # 살아있는 뉴런들의 평균 norm으로 스케일링
@@ -207,9 +206,9 @@ class StandardTrainer():
 
             # dead 뉴런 재초기화
             sampled_vecs_normalized = sampled_vecs / sampled_vecs.norm(dim=-1, keepdim=True)
-            # self.ae.encoder.weight[deads] = sampled_vecs_normalized * alive_norm * 0.2  # [n_dead, activation_dim]  (possible fix)
+            # self.ae.encoder.weight[deads] = sampled_vecs_normalized * alive_norm * 0.2  # [n_dead, activation_dim] (TODO: possible fix)
             self.ae.encoder.weight[deads] = sampled_vecs * alive_norm * 0.2  # [n_dead, activation_dim]
-            self.ae.decoder.weight[:,deads] = sampled_vecs_normalized.T  # [activation_dim, n_dead]
+            self.ae.decoder.weight[:, deads] = sampled_vecs_normalized.T  # [activation_dim, n_dead]
             self.ae.encoder.bias[deads] = 0.
 
             # Adam 옵티마이저 상태 초기화
@@ -224,9 +223,10 @@ class StandardTrainer():
             state_dict[2]['exp_avg_sq'][deads] = 0.
 
             # decoder weight
-            state_dict[3]['exp_avg'][:,deads] = 0.
-            state_dict[3]['exp_avg_sq'][:,deads] = 0.
+            state_dict[3]['exp_avg'][:, deads] = 0.
+            state_dict[3]['exp_avg_sq'][:, deads] = 0.
 
+    # step is for interface compatibility
     def loss(self, x, step=None, logging=False, **kwargs):
         x_hat, f = self.ae(x, output_features=True)
         l2_loss = torch.linalg.norm(x - x_hat, dim=-1).mean()
@@ -243,15 +243,15 @@ class StandardTrainer():
         if not logging:
             return loss
         else:
-            return namedtuple('LossLog', ['x', 'x_hat', 'f', 'losses'])(
-                x, x_hat, f,
-                {
-                    'loss' : loss.item(),
-                    'l2_loss' : l2_loss.item(),
-                    'mse_loss' : (x - x_hat).pow(2).sum(dim=-1).mean().item(),
-                    'sparsity_loss' : l1_loss.item(),
-                }
-            )
+            return namedtuple(
+                'LossLog',
+                ['x', 'x_hat', 'f', 'losses']
+            )(x, x_hat, f, {
+                'loss': loss.item(),
+                'l2_loss': l2_loss.item(),
+                'mse_loss': (x - x_hat).pow(2).sum(dim=-1).mean().item(),
+                'sparsity_loss': l1_loss.item(),
+            })
 
     def update(self, step, activations):
         activations = activations.to(self.device)
@@ -260,7 +260,7 @@ class StandardTrainer():
         loss = self.loss(activations)
         loss.backward()
 
-        # Add gradient clipping
+        # add gradient clipping
         torch.nn.utils.clip_grad_norm_(self.ae.parameters(), max_norm=5.0)
         self.optimizer.step()
         self.scheduler.step()
@@ -272,12 +272,12 @@ class StandardTrainer():
     def config(self):
         return {
             'dict_class': 'AutoEncoder',
-            'trainer_class' : 'StandardTrainer',
+            'trainer_class': 'StandardTrainer',
             'activation_dim': self.ae.activation_dim,
             'dict_size': self.ae.dict_size,
-            'lr' : self.lr,
-            'l1_penalty' : self.l1_penalty,
-            'warmup_steps' : self.warmup_steps,
-            'resample_steps' : self.resample_steps,
-            'device' : self.device,
+            'lr': self.lr,
+            'l1_penalty': self.l1_penalty,
+            'warmup_steps': self.warmup_steps,
+            'resample_steps': self.resample_steps,
+            'device': self.device,
         }

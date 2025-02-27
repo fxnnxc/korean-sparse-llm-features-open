@@ -25,13 +25,11 @@ class ConstrainedAdam(torch.optim.Adam):
         with torch.no_grad():
             for p in self.constrained_params:
                 normed_p = p / p.norm(dim=0, keepdim=True)
-                # project away the parallel component of the gradient
-                p.grad -= (p.grad * normed_p).sum(dim=0, keepdim=True) * normed_p
+                p.grad -= (p.grad * normed_p).sum(dim=0, keepdim=True) * normed_p  # project away the parallel component of the gradient
         super().step(closure=closure)
         with torch.no_grad():
             for p in self.constrained_params:
-                # renormalize the constrained parameters
-                p /= p.norm(dim=0, keepdim=True)
+                p /= p.norm(dim=0, keepdim=True)  # renormalize the constrained parameters
 
 
 class GatedAutoEncoder(nn.Module):
@@ -81,7 +79,6 @@ class GatedAutoEncoder(nn.Module):
         # magnitude network
         pi_mag = self.r_mag.exp() * x_enc + self.mag_bias
         f_mag = nn.ReLU()(pi_mag)
-
         f = f_gate * f_mag
 
         # W_dec norm is not kept constant, as per Anthropic's April 2024 Update
@@ -102,9 +99,7 @@ class GatedAutoEncoder(nn.Module):
     def forward(self, x, output_features=False):
         f = self.encode(x)
         x_hat = self.decode(f)
-
         f = f * self.decoder.weight.norm(dim=0, keepdim=True)
-
         if output_features:
             return x_hat, f
         else:
@@ -130,23 +125,22 @@ class GatedTrainer():
     def __init__(self,
                  dict_class=GatedAutoEncoder,
                  activation_dim=512,
-                 dict_size=64*512,
+                 dict_size=64 * 512,
                  lr=3e-4,
-                 warmup_steps=1000, # lr warmup period at start of training and after each resample
-                 sparsity_function='Lp^p', # Lp or Lp^p
-                 initial_sparsity_penalty=1e-1, # equal to l1 penalty in standard trainer
-                 anneal_start=15000, # step at which to start annealing p
-                 anneal_end=None, # step at which to stop annealing, defaults to steps-1
-                 p_start=1, # starting value of p (constant throughout warmup)
-                 p_end=0, # annealing p_start to p_end linearly after warmup_steps, exact endpoint excluded
-                 n_sparsity_updates = 10, # number of times to update the sparsity penalty, at most steps-anneal_start times
-                 sparsity_queue_length = 10, # number of recent sparsity loss terms, onle needed for adaptive_sparsity_penalty
-                 resample_steps=None, # number of steps after which to resample dead neurons
-                 steps=None, # total number of steps to train for
-                 device='cuda:0',
-    ):
+                 warmup_steps=1000,  # lr warmup period at start of training and after each resample
+                 sparsity_function='Lp^p',  # Lp or Lp^p
+                 initial_sparsity_penalty=1e-1,  # equal to l1 penalty in standard trainer
+                 anneal_start=15000,  # step at which to start annealing p
+                 anneal_end=None,  # step at which to stop annealing, defaults to steps-1
+                 p_start=1,  # starting value of p (constant throughout warmup)
+                 p_end=0,  # annealing p_start to p_end linearly after warmup_steps, exact endpoint excluded
+                 n_sparsity_updates=10,  # number of times to update the sparsity penalty, at most steps-anneal_start times
+                 sparsity_queue_length=10,  # number of recent sparsity loss terms, onle needed for adaptive_sparsity_penalty
+                 resample_steps=None,  # number of steps after which to resample dead neurons
+                 total_steps=None,  # total number of steps to train for
+                 device='cuda',
+                 ):
 
-        # initialize dictionary
         # initialize dictionary
         self.activation_dim = activation_dim
         self.dict_size = dict_size
@@ -158,26 +152,26 @@ class GatedTrainer():
         self.lr = lr
         self.sparsity_function = sparsity_function
         self.anneal_start = anneal_start
-        self.anneal_end = anneal_end if anneal_end is not None else steps
+        self.anneal_end = anneal_end if anneal_end is not None else total_steps
         self.p_start = p_start
         self.p_end = p_end
-        self.p = p_start # p is set in self.loss()
-        self.next_p = None # set in self.loss()
-        self.lp_loss = None # set in self.loss()
-        self.scaled_lp_loss = None # set in self.loss()
-        if n_sparsity_updates == "continuous":
-            self.n_sparsity_updates = self.anneal_end - anneal_start +1
+        self.p = p_start  # p is set in self.loss()
+        self.next_p = None  # set in self.loss()
+        self.lp_loss = None  # set in self.loss()
+        self.scaled_lp_loss = None  # set in self.loss()
+        if n_sparsity_updates == 'continuous':
+            self.n_sparsity_updates = self.anneal_end - anneal_start + 1
         else:
             self.n_sparsity_updates = n_sparsity_updates
         self.sparsity_update_steps = torch.linspace(anneal_start, self.anneal_end, self.n_sparsity_updates, dtype=int)
         self.p_values = torch.linspace(p_start, p_end, self.n_sparsity_updates)
         self.p_step_count = 0
-        self.sparsity_coeff = initial_sparsity_penalty # alpha
+        self.sparsity_coeff = initial_sparsity_penalty  # alpha
         self.sparsity_queue_length = sparsity_queue_length
         self.sparsity_queue = []
 
         self.warmup_steps = warmup_steps
-        self.steps = steps
+        self.total_steps = total_steps
         self.logging_parameters = ['p', 'next_p', 'lp_loss', 'scaled_lp_loss', 'sparsity_coeff']
 
         self.resample_steps = resample_steps
@@ -197,56 +191,76 @@ class GatedTrainer():
         self.scheduler = torch.optim.lr_scheduler.LambdaLR(self.optimizer, lr_lambda=warmup_fn)
 
     def resample_neurons(self, deads, activations):
+        # activations: [batch_size, activation_dim]
+        # self.ae.encoder.weight: [activation_dim, dict_size]
+        # self.ae.decoder.weight: [dict_size, activation_dim]
         with torch.no_grad():
             if deads.sum() == 0:
-                # print("no dead neurons")
                 return
 
             print(f"resampling {deads.sum().item()} neurons")
 
             # 각 뉴런의 평균 activation 크기 계산
-            _, features = self.ae(activations, output_features=True)
+            _, features = self.ae(activations, output_features=True)  # [batch_size, dict_size]
             mean_activation = features.mean(dim=0)  # [dict_size]
 
             # activation이 가장 작은 뉴런들을 dead로 표시
             threshold = torch.quantile(mean_activation, 0.1)  # 하위 10% 뉴런 선택
-            deads = mean_activation < threshold
+            deads = mean_activation < threshold  # [dict_size] (boolean tensor)
 
-            if deads.sum() == 0: return
+            if deads.sum() == 0:
+                return
 
             # 높은 재구성 오차를 가진 입력 샘플 선택
-            losses = (activations - self.ae(activations)).norm(dim=-1)
-            n_resample = min([deads.sum(), losses.shape[0]])
-            indices = torch.multinomial(losses, num_samples=n_resample, replacement=False)
-            sampled_vecs = activations[indices]
+            losses = (activations - self.ae(activations)).norm(dim=-1)  # [batch_size]
+            n_resample = min(deads.sum(), losses.shape[0])  # batch_size
+            indices = torch.multinomial(losses, num_samples=n_resample, replacement=False)  # [n_resample]
+            sampled_vecs = activations[indices]  # [n_resample, activation_dim]
 
             # 살아있는 뉴런들의 평균 norm으로 스케일링
-            alive_norm = self.ae.encoder.weight[~deads].norm(dim=-1).mean()
+            alive_norm = self.ae.encoder.weight[~deads].norm(dim=-1).mean()  # [n_alive, activation_dim]
 
             # dead 뉴런 재초기화
             sampled_vecs_normalized = sampled_vecs / sampled_vecs.norm(dim=-1, keepdim=True)
-            self.ae.encoder.weight[deads] = sampled_vecs * alive_norm * 0.2
-            self.ae.decoder.weight[:,deads] = sampled_vecs_normalized.T
+            # self.ae.encoder.weight[deads] = sampled_vecs_normalized * alive_norm * 0.2  # [n_dead, activation_dim] (TODO: possible fix)
+            self.ae.encoder.weight[deads] = sampled_vecs * alive_norm * 0.2  # [n_dead, activation_dim]
+            # TODO: possible error example - RuntimeError: shape mismatch: value tensor of shape [32, 4096] cannot be broadcast to indexing result of shape [410, 4096]
+            """AI's solution
+            # Get the expected shape from deads
+            expected_dead_count = len(deads)
+            if sampled_vecs.shape[0] != expected_dead_count:
+                # Repeat or slice sampled_vecs to match the number of dead neurons
+                if sampled_vecs.shape[0] < expected_dead_count:
+                    # If we have fewer samples than dead neurons, repeat the samples
+                    repeat_factor = (expected_dead_count + sampled_vecs.shape[0] - 1) // sampled_vecs.shape[0]
+                    sampled_vecs = sampled_vecs.repeat(repeat_factor, 1)
+                # Slice to exact size needed
+                sampled_vecs = sampled_vecs[:expected_dead_count]
+            """
+            self.ae.decoder.weight[:, deads] = sampled_vecs_normalized.T  # [activation_dim, n_dead]
             self.ae.encoder.bias[deads] = 0.
 
             # Adam 옵티마이저 상태 초기화
             state_dict = self.optimizer.state_dict()['state']
-            ## encoder weight
+
+            # encoder weight
             state_dict[1]['exp_avg'][deads] = 0.
             state_dict[1]['exp_avg_sq'][deads] = 0.
-            ## encoder bias
+
+            # encoder bias
             state_dict[2]['exp_avg'][deads] = 0.
             state_dict[2]['exp_avg_sq'][deads] = 0.
-            ## decoder weight
-            state_dict[3]['exp_avg'][:,deads] = 0.
-            state_dict[3]['exp_avg_sq'][:,deads] = 0.
+
+            # decoder weight
+            state_dict[3]['exp_avg'][:, deads] = 0.
+            state_dict[3]['exp_avg_sq'][:, deads] = 0.
 
     def lp_norm(self, f, p):
         norm_sq = f.pow(p).sum(dim=-1)
         if self.sparsity_function == 'Lp^p':
             return norm_sq.mean()
         elif self.sparsity_function == 'Lp':
-            return norm_sq.pow(1/p).mean()
+            return norm_sq.pow(1 / p).mean()
         else:
             raise ValueError("Sparsity function must be 'Lp' or 'Lp^p'")
 
@@ -258,7 +272,7 @@ class GatedTrainer():
         L_recon = (x - x_hat).pow(2).sum(dim=-1).mean()
         L_aux = (x - x_hat_gate).pow(2).sum(dim=-1).mean()
 
-        fs = f_gate # feature activation that we use for sparsity term
+        fs = f_gate  # feature activation that we use for sparsity term
         lp_loss = self.lp_norm(fs, self.p)
         scaled_lp_loss = lp_loss * self.sparsity_coeff
         self.lp_loss = lp_loss
@@ -270,23 +284,27 @@ class GatedTrainer():
             self.sparsity_queue = self.sparsity_queue[-self.sparsity_queue_length:]
 
         if step in self.sparsity_update_steps:
+
             # check to make sure we don't update on repeat step:
             if step >= self.sparsity_update_steps[self.p_step_count]:
-                # Adapt sparsity penalty alpha
+
+                # adapt sparsity penalty alpha
                 if self.next_p is not None:
                     local_sparsity_new = torch.tensor([i[0] for i in self.sparsity_queue]).mean()
                     local_sparsity_old = torch.tensor([i[1] for i in self.sparsity_queue]).mean()
                     self.sparsity_coeff = self.sparsity_coeff * (local_sparsity_new / local_sparsity_old).item()
-                # Update p
+
+                # update p
                 self.p = self.p_values[self.p_step_count].item()
-                if self.p_step_count < self.n_sparsity_updates-1:
-                    self.next_p = self.p_values[self.p_step_count+1].item()
+                if self.p_step_count < self.n_sparsity_updates - 1:
+                    self.next_p = self.p_values[self.p_step_count + 1].item()
                 else:
                     self.next_p = self.p_end
                 self.p_step_count += 1
 
-        # Update dead feature count
+        # update dead feature count
         if self.steps_since_active is not None:
+
             # update steps_since_active
             deads = (f == 0).all(dim=0)
             self.steps_since_active[deads] += 1
@@ -297,19 +315,19 @@ class GatedTrainer():
         if not logging:
             return loss
         else:
-            return namedtuple('LossLog', ['x', 'x_hat', 'f', 'losses'])(
-                x, x_hat, f,
-                {
-                    'loss': loss.item(),
-                    'mse_loss': L_recon.item(),
-                    'aux_loss': L_aux.item(),
-                    'p': self.p,
-                    'next_p': self.next_p,
-                    'lp_loss': lp_loss.item(),
-                    'sparsity_loss': scaled_lp_loss.item(),
-                    'sparsity_coeff': self.sparsity_coeff,
-                }
-            )
+            return namedtuple(
+                'LossLog',
+                ['x', 'x_hat', 'f', 'losses']
+            )(x, x_hat, f, {
+                'loss': loss.item(),
+                'mse_loss': L_recon.item(),
+                'aux_loss': L_aux.item(),
+                'p': self.p,
+                'next_p': self.next_p,
+                'lp_loss': lp_loss.item(),
+                'sparsity_loss': scaled_lp_loss.item(),
+                'sparsity_coeff': self.sparsity_coeff,
+            })
 
     def update(self, step, activations):
         activations = activations.to(self.device)
@@ -317,30 +335,19 @@ class GatedTrainer():
         self.optimizer.zero_grad()
         loss = self.loss(activations, step, logging=False)
         loss.backward()
+
+        # torch.nn.utils.clip_grad_norm_(self.ae.parameters(), max_norm=5.0)  # (TODO: possible fix)
         self.optimizer.step()
         self.scheduler.step()
 
         if self.resample_steps is not None and step % self.resample_steps == self.resample_steps - 1:
             self.resample_neurons(self.steps_since_active > self.resample_steps / 2, activations)
 
-    # @property
-    # def config(self):
-    #     return {
-    #         'trainer_class': 'GatedSAETrainer',
-    #         'activation_dim': self.ae.activation_dim,
-    #         'dict_size': self.ae.dict_size,
-    #         'lr': self.lr,
-    #         'l1_penalty': self.l1_penalty,
-    #         'warmup_steps': self.warmup_steps,
-    #         'device': self.device,
-    #         'wandb_name': self.wandb_name,
-    #     }
-
     @property
     def config(self):
         return {
-            'trainer_class': "GatedAnnealTrainer",
-            'dict_class': "GatedAutoEncoder",
+            'trainer_class': 'GatedAnnealTrainer',
+            'dict_class': 'GatedAutoEncoder',
             'activation_dim': self.activation_dim,
             'dict_size': self.dict_size,
             'lr': self.lr,
@@ -353,5 +360,6 @@ class GatedTrainer():
             'n_sparsity_updates': self.n_sparsity_updates,
             'warmup_steps': self.warmup_steps,
             'resample_steps': self.resample_steps,
-            'steps': self.steps,
+            'total_steps': self.total_steps,
+            'device': self.device,
         }

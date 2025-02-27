@@ -20,16 +20,16 @@ from scipy.stats import gaussian_kde
 
 
 __all__ = [
-    'get_keat_small_dataset',
+    'get_keat_dataset',
 ]
 
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
 
 
-def get_keat_small_dataset():
+def get_keat_dataset():
     """
-    Get KEAT small dataset, while downloading and extracting the dataset if it is not already downloaded.
+    Get KEAT (small) dataset, while downloading and extracting the dataset if it is not already downloaded.
     """
 
     data = {
@@ -80,7 +80,7 @@ def download_and_extract_mrl():
             data = json.load(fpi)
         if len(data) == 700:
             dev_data_exists = True
-    except:
+    except Exception:
         pass
     eval_data_exists = False
     try:
@@ -88,7 +88,7 @@ def download_and_extract_mrl():
             data = json.load(fpi)
         if len(data) == 700:
             eval_data_exists = True
-    except:
+    except Exception:
         pass
     if dev_data_exists and eval_data_exists:
         return
@@ -104,7 +104,7 @@ def download_and_extract_mrl():
     temp_dir.mkdir(exist_ok=True)
 
     # extract to temp directory
-    print(f"Extracting files...")
+    print("Extracting files...")
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         zip_ref.extractall(temp_dir)
 
@@ -251,7 +251,7 @@ def visualize_text_lengths(split2textdataset: Dict[str, Dataset], figsize=(12, 4
         x_grid = np.linspace(min(lengths), max(lengths), 500)  # More points for smoother curve
 
         # Use even smaller bandwidth for more detail
-        bandwidth = 0.01 * np.std(lengths) * (len(lengths) ** (-1/5))  # Reduced from 0.15 to 0.02
+        bandwidth = 0.01 * np.std(lengths) * (len(lengths) ** (-1 / 5))  # Reduced from 0.15 to 0.02
         kde = gaussian_kde(lengths, bw_method=bandwidth)
         kde_values = kde(x_grid)
 

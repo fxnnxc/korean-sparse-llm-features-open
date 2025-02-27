@@ -17,19 +17,19 @@ from lib.utils.data import get_dataloder_from_dataset
 from lib.utils.fetch import MultipleFetch
 from lib.utils.model import get_exaone
 from lib.utils.tokenize import get_tokenized_dataset
-from lib.datasets.keat_small import get_keat_small_dataset
+from lib.datasets.keat import get_keat_dataset
+
 
 def get_flags():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', type=str, default='news')
+    parser.add_argument('--dataset', type=str, default='keat')
     parser.add_argument('--max_length', type=int, default=128)
     parser.add_argument('--lm_name', type=str, default='exaone')
     parser.add_argument('--lm_size', type=str, default='8b')
     parser.add_argument('--lm_cache_dir', type=str, default=PROJECT_ROOT / 'cache')
     parser.add_argument('--device_map', type=str, default='auto')
-    parser.add_argument('--output_dir', type=str, default='outputs')
+    parser.add_argument('--output_dir', type=str, default=PROJECT_ROOT / 'outputs')
     parser.add_argument('--batch_size', type=int, default=4)
-    parser.add_argument('--split', type=str, default='train')
     flags = parser.parse_args()
     flags = OmegaConf.create(vars(flags))
     return flags
@@ -96,8 +96,8 @@ def main(flags):
 
 
     # prepare dataset
-    dataset, _ = get_keat_small_dataset()
-    dataset_target = dataset[flags.split]
+    dataset, _ = get_keat_dataset()
+    dataset_target = dataset['train']
     dataset_en = get_tokenized_dataset(
         dataset_target,
         tokenizer,
@@ -122,18 +122,18 @@ def main(flags):
     dataset_ko = dataset_ko.rename_columns({'attention_mask': 'ko_attention_mask'})
     dataset = dataset_en.add_column('ko_input_ids', dataset_ko['ko_input_ids'])
     dataset = dataset.add_column('ko_attention_mask', dataset_ko['ko_attention_mask'])
-    print(dataset)  # TODO: remove
     dataloader = get_dataloder_from_dataset(dataset, batch_size=flags.batch_size)
 
     # fetch and save activations
     for lang in ('en', 'ko'):
-        print(f"Processing keat-{lang} dataset...")
+        name = f'keat-{lang}'
+        print(f"Processing {name} dataset...")
         pbar = tqdm(dataloader)
         for batch in pbar:
 
             # move to device
-            b_tokens = batch[f'{lang}_input_ids'].to(llm.device)
-            b_mask = batch[f'{lang}_attention_mask'].to(llm.device)
+            b_tokens = batch[f'{name}_input_ids'].to(llm.device)
+            b_mask = batch[f'{name}_attention_mask'].to(llm.device)
 
             # clear fetched_values (for each batch), but maybe we can do better
             for k in dict_format.keys():
@@ -145,26 +145,26 @@ def main(flags):
             # gather activations
             for b in range(b_tokens.shape[0]):
                 tokens = b_tokens[b].detach().cpu()
-                activations[f'{lang}_input_ids'].append(tokens)
-                activations[f'{lang}_residual_q0'].append(
+                activations[f'{name}_input_ids'].append(tokens)
+                activations[f'{name}_residual_q0'].append(
                     dict_format['residual_q0']['module']
                     .fetched_values[0][b]  # always 0 since we're clearing fetched_values everytime (maybe better design might exist)
                     .detach()
                     .cpu()
                 )
-                activations[f'{lang}_residual_q1'].append(
+                activations[f'{name}_residual_q1'].append(
                     dict_format['residual_q1']['module']
                     .fetched_values[0][b]
                     .detach()
                     .cpu()
                 )
-                activations[f'{lang}_residual_q2'].append(
+                activations[f'{name}_residual_q2'].append(
                     dict_format['residual_q2']['module']
                     .fetched_values[0][b]
                     .detach()
                     .cpu()
                 )
-                activations[f'{lang}_residual_q3'].append(
+                activations[f'{name}_residual_q3'].append(
                     dict_format['residual_q3']['module']
                     .fetched_values[0][b]
                     .detach()
@@ -176,14 +176,15 @@ def main(flags):
     output_dir = PROJECT_ROOT / flags.output_dir
     output_dir.mkdir(parents=True, exist_ok=True)
     for lang in ('en', 'ko'):
+        name = f'keat-{lang}'
         selected_activations = {
-            f'{lang}_input_ids': torch.stack(activations[f'{lang}_input_ids']),
-            f'{lang}_residual_q0': torch.stack(activations[f'{lang}_residual_q0']),
-            f'{lang}_residual_q1': torch.stack(activations[f'{lang}_residual_q1']),
-            f'{lang}_residual_q2': torch.stack(activations[f'{lang}_residual_q2']),
-            f'{lang}_residual_q3': torch.stack(activations[f'{lang}_residual_q3']),
+            f'{name}_input_ids': torch.stack(activations[f'{name}_input_ids']),
+            f'{name}_residual_q0': torch.stack(activations[f'{name}_residual_q0']),
+            f'{name}_residual_q1': torch.stack(activations[f'{name}_residual_q1']),
+            f'{name}_residual_q2': torch.stack(activations[f'{name}_residual_q2']),
+            f'{name}_residual_q3': torch.stack(activations[f'{name}_residual_q3']),
         }
-        with open(output_dir / f'activations_{flags.lm_name}_{flags.lm_size}_keat-{lang}.pkl', 'wb') as fpi:
+        with open(output_dir / f'activations_{flags.lm_name}-{flags.lm_size}_{name}.pkl', 'wb') as fpi:
             pickle.dump(selected_activations, fpi, protocol=pickle.HIGHEST_PROTOCOL)
 
     print("Done!")

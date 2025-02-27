@@ -1,6 +1,6 @@
 SYNTH_SEED = {
-    "음식": {
-        "templates": [
+    '음식': {
+        'templates': [
             "나는 어제 특별한 날이라 {symbol} 먹었다.",
             "배가 고플 때 {symbol} 먹는 게 최고다.",
             "건강을 챙기고 싶다면 {symbol} 먹어야 한다.",
@@ -12,7 +12,7 @@ SYNTH_SEED = {
             "축하할 일이 있을 때 {symbol} 먹으면 기분이 좋다.",
             "여행 갈 때 꼭 {symbol} 먹어야 한다.",
         ],
-        "categories": [
+        'categories': [
             "밥을",
             "김치를",
             "샐러드를",
@@ -25,8 +25,8 @@ SYNTH_SEED = {
             "초밥을",
         ],
     },
-    "옷": {
-        "templates": [
+    '옷': {
+        'templates': [
             "오늘 중요한 미팅을 위해 {symbol} 입었다.",
             "날씨가 추워지면 {symbol} 준비한다.",
             "새로운 계절을 맞아 {symbol} 입어봤다.",
@@ -38,7 +38,7 @@ SYNTH_SEED = {
             "새로 산 {symbol} 오늘 처음 입어봤다.",
             "특별한 날에는 {symbol} 입는 게 어울린다.",
         ],
-        "categories": [
+        'categories': [
             "티셔츠를",
             "청바지를",
             "드레스를",
@@ -51,8 +51,8 @@ SYNTH_SEED = {
             "니트를",
         ],
     },
-    "운동": {
-        "templates": [
+    '운동': {
+        'templates': [
             "하루를 상쾌하게 시작하려면 {symbol} 해야 한다.",
             "지친 몸과 마음을 달래줄 운동은 {symbol} 하는 것이다.",
             "목표를 이루기 위해 매일 {symbol} 하고 있다.",
@@ -64,7 +64,7 @@ SYNTH_SEED = {
             "친구들과 함께 {symbol} 하면 더 재미있다.",
             "휴일에는 야외에서 {symbol} 즐기는 게 좋다.",
         ],
-        "categories": [
+        'categories': [
             "요가를",
             "달리기를",
             "수영을",
@@ -77,8 +77,8 @@ SYNTH_SEED = {
             "농구를",
         ],
     },
-    "여행": {
-        "templates": [
+    '여행': {
+        'templates': [
             "이번 여름에는 꼭 {symbol} 가보고 싶다.",
             "친구들과 함께 추억을 쌓기 위해 {symbol} 갔다.",
             "휴식을 위해 완벽한 선택은 {symbol} 가는 것이다.",
@@ -90,7 +90,7 @@ SYNTH_SEED = {
             "가족과 함께 {symbol} 다녀오기로 했다.",
             "특별한 날을 기념하려고 {symbol} 다녀왔다.",
         ],
-        "categories": [
+        'categories': [
             "서울을",
             "제주도를",
             "파리를",
@@ -103,8 +103,8 @@ SYNTH_SEED = {
             "런던을",
         ],
     },
-    "취미": {
-        "templates": [
+    '취미': {
+        'templates': [
             "새로운 도전을 위해 {symbol} 시작했다.",
             "스트레스를 해소하려고 {symbol} 시작했다.",
             "여가 시간을 활용해서 {symbol} 하고 있다.",
@@ -116,7 +116,7 @@ SYNTH_SEED = {
             "창의력을 키우려고 {symbol} 하고 있다.",
             "새로운 기술을 배우기 위해 {symbol} 배우고 있다.",
         ],
-        "categories": [
+        'categories': [
             "사진 찍기를",
             "독서를",
             "요리를",
@@ -129,8 +129,8 @@ SYNTH_SEED = {
             "게임을",
         ],
     },
-    "영화": {
-        "templates": [
+    '영화': {
+        'templates': [
             "주말 저녁에 {symbol} 보는 게 나의 힐링 방법이다.",
             "친구들과 함께 {symbol} 보면서 시간을 보냈다.",
             "새로운 감독의 작품이라 {symbol} 꼭 보고 싶었다.",
@@ -142,7 +142,7 @@ SYNTH_SEED = {
             "마음이 심란할 때 {symbol} 보는 게 위로가 됐다.",
             "영감을 얻고 싶어 {symbol} 봤다.",
         ],
-        "categories": [
+        'categories': [
             "드라마 영화를",
             "코미디 영화를",
             "액션 영화를",
@@ -155,8 +155,8 @@ SYNTH_SEED = {
             "SF 영화를",
         ],
     },
-    "음악": {
-        "templates": [
+    '음악': {
+        'templates': [
             "아침을 시작하며 {symbol} 들었다.",
             "기분이 우울할 때 {symbol} 듣는 게 좋다.",
             "운동할 때 항상 {symbol} 듣는다.",
@@ -168,7 +168,7 @@ SYNTH_SEED = {
             "여행 중에 {symbol} 듣고 감회가 새로웠다.",
             "특별한 날 {symbol} 들으며 시간을 보냈다.",
         ],
-        "categories": [
+        'categories': [
             "발라드를",
             "재즈를",
             "클래식을",
@@ -181,8 +181,8 @@ SYNTH_SEED = {
             "포크 음악을",
         ],
     },
-    "책": {
-        "templates": [
+    '책': {
+        'templates': [
             "휴식을 위해 {symbol} 읽었다.",
             "주말에 {symbol} 읽으며 시간을 보냈다.",
             "추천받은 {symbol} 읽어봤다.",
@@ -194,7 +194,7 @@ SYNTH_SEED = {
             "영감을 얻기 위해 {symbol} 읽었다.",
             "취미로 시작한 독서에서 {symbol} 만났다.",
         ],
-        "categories": [
+        'categories': [
             "소설을",
             "에세이를",
             "과학책을",
@@ -207,8 +207,8 @@ SYNTH_SEED = {
             "예술책을",
         ],
     },
-    "게임": {
-        "templates": [
+    '게임': {
+        'templates': [
             "친구와 함께 {symbol} 즐겼다.",
             "휴식을 위해 {symbol} 했다.",
             "오랜만에 {symbol} 하니 기분이 좋았다.",
@@ -220,7 +220,7 @@ SYNTH_SEED = {
             "혼자만의 시간을 위해 {symbol} 했다.",
             "추억의 {symbol} 다시 해봤다.",
         ],
-        "categories": [
+        'categories': [
             "RPG를",
             "FPS를",
             "퍼즐 게임을",
@@ -233,8 +233,8 @@ SYNTH_SEED = {
             "액션 게임을",
         ],
     },
-    "예술": {
-        "templates": [
+    '예술': {
+        'templates': [
             "미술관에서 {symbol} 감상했다.",
             "예술을 공부하며 {symbol} 공부했다.",
             "친구와 함께 {symbol} 보러 갔다.",
@@ -246,7 +246,7 @@ SYNTH_SEED = {
             "새로운 취향을 발견하며 {symbol} 접했다.",
             "전문가에게 배우며 {symbol} 경험했다.",
         ],
-        "categories": [
+        'categories': [
             "유화를",
             "조각을",
             "수채화를",
@@ -259,8 +259,8 @@ SYNTH_SEED = {
             "드로잉을",
         ],
     },
-    "연극": {
-        "templates": [
+    '연극': {
+        'templates': [
             "주말에 친구와 함께 {symbol} 보러 갔다.",
             "학교에서 추천받은 {symbol} 감상했다.",
             "문화생활을 즐기기 위해 {symbol} 보았다.",
@@ -272,7 +272,7 @@ SYNTH_SEED = {
             "가족과 함께 {symbol} 보면서 즐거운 시간을 보냈다.",
             "예술적 영감을 위해 {symbol} 관람했다.",
         ],
-        "categories": [
+        'categories': [
             "뮤지컬을",
             "희극을",
             "비극을",
@@ -285,8 +285,8 @@ SYNTH_SEED = {
             "창작 연극을",
         ],
     },
-    "역사": {
-        "templates": [
+    '역사': {
+        'templates': [
             "역사책에서 읽었던 {symbol} 알아봤다.",
             "다큐멘터리에서 {symbol} 알게 되었다.",
             "박물관에서 {symbol} 직접 봤다.",
@@ -298,7 +298,7 @@ SYNTH_SEED = {
             "다큐멘터리를 통해 {symbol} 조사해봤다.",
             "역사적 영감을 얻기 위해 {symbol} 탐구했다.",
         ],
-        "categories": [
+        'categories': [
             "고대 문명을",
             "중세 유럽을",
             "산업혁명을",
@@ -311,8 +311,8 @@ SYNTH_SEED = {
             "식민 지배를",
         ],
     },
-    "종교": {
-        "templates": [
+    '종교': {
+        'templates': [
             "명상 중에 {symbol} 생각해봤다.",
             "종교 서적에서 {symbol} 배웠다.",
             "문화 체험에서 {symbol} 경험했다.",
@@ -324,7 +324,7 @@ SYNTH_SEED = {
             "종교적 영감을 얻기 위해 {symbol} 탐구했다.",
             "역사적 관점에서 {symbol} 공부했다.",
         ],
-        "categories": [
+        'categories': [
             "기독교를",
             "불교를",
             "이슬람교를",
@@ -337,8 +337,8 @@ SYNTH_SEED = {
             "고대 종교를",
         ],
     },
-    "과학 실험": {
-        "templates": [
+    '과학 실험': {
+        'templates': [
             "학교 실험실에서 {symbol} 해봤다.",
             "다큐멘터리에서 {symbol} 과정을 보았다.",
             "교수님의 추천으로 {symbol} 진행했다.",
@@ -350,7 +350,7 @@ SYNTH_SEED = {
             "새로운 연구에서 {symbol} 접하게 되었다.",
             "직접 참여하며 {symbol} 이해할 수 있었다.",
         ],
-        "categories": [
+        'categories': [
             "화학 반응 실험을",
             "물리 실험을",
             "생물학 실험을",
@@ -363,8 +363,8 @@ SYNTH_SEED = {
             "로봇 공학 실험을",
         ],
     },
-    "철학적 토론": {
-        "templates": [
+    '철학적 토론': {
+        'templates': [
             "철학 수업에서 {symbol} 논의했다.",
             "친구와 심도 깊게 {symbol} 얘기해봤다.",
             "독서를 하며 {symbol} 고민했다.",
@@ -376,7 +376,7 @@ SYNTH_SEED = {
             "영화 속에서 {symbol} 장면을 보며 생각했다.",
             "새로운 관점에서 {symbol} 다시 고민해봤다.",
         ],
-        "categories": [
+        'categories': [
             "인간 존재에 대해",
             "윤리에 대해",
             "정의에 대해",

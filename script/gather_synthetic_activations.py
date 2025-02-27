@@ -29,7 +29,7 @@ def get_flags():
     parser.add_argument('--lm_size', type=str, default='8b')
     parser.add_argument('--lm_cache_dir', type=str, default=PROJECT_ROOT / 'cache')
     parser.add_argument('--device_map', type=str, default='auto')
-    parser.add_argument('--output_dir', type=str, default='outputs')
+    parser.add_argument('--output_dir', type=str, default=PROJECT_ROOT / 'outputs')
     parser.add_argument('--batch_size', type=int, default=4)
     flags = parser.parse_args()
     flags = OmegaConf.create(vars(flags))
@@ -179,7 +179,7 @@ def main(flags):
         f'{name}_residual_q2': torch.stack(activations[f'{name}_residual_q2']),
         f'{name}_residual_q3': torch.stack(activations[f'{name}_residual_q3']),
     }
-    with open(output_dir / f'activations_{flags.lm_name}_{flags.lm_size}_{name}.pkl', 'wb') as fpi:
+    with open(output_dir / f'activations_{flags.lm_name}-{flags.lm_size}_{name}.pkl', 'wb') as fpi:
         pickle.dump(selected_activations, fpi, protocol=pickle.HIGHEST_PROTOCOL)
 
     print("Done!")

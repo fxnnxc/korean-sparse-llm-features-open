@@ -79,7 +79,7 @@ def custom_device_map(lm_size, num_gpus):
     gpu = 0
     per_block = model_size // num_gpus
     for i in range(1, model_size + 1):
-        device_map[f'transformer.h.{i-1}'] = gpu
+        device_map[f'transformer.h.{i - 1}'] = gpu
         if i % per_block == 0 and gpu < num_gpus - 1:
             gpu += 1
     return device_map

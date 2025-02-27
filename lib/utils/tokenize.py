@@ -4,16 +4,16 @@ __all__ = [
 
 
 def get_tokenized_dataset(
-    dataset,          # HuggingFace Dataset
-    tokenizer,        # HuggingFace Tokenizer
-    batch_size,       # 배치 처리 크기
-    num_proc=None,    # 병렬 처리 프로세스 수
-    target_name='text',      # 토큰화할 컬럼 이름
-    output_name='input_ids', # 출력 토큰 ID 컬럼 이름
-    preserve_names=[],       # 보존할 컬럼들
-    max_length=None,         # 최대 시퀀스 길이
-    padding=True,            # 패딩 여부
-    truncation=False,        # 잘라내기 여부
+    dataset,  # HuggingFace Dataset
+    tokenizer,  # HuggingFace Tokenizer
+    batch_size,
+    num_proc=None,  # 병렬 처리 프로세스 수
+    target_name='text',
+    output_name='input_ids',
+    preserve_names=[],
+    max_length=None,
+    padding=True,
+    truncation=False,
 ):
 
     # 배치 단위 토큰화 함수
@@ -50,18 +50,18 @@ def get_tokenized_dataset(
         return batch_inputs
 
     # 5. 토크나이저 설정
-    tokenizer.padding_side = 'left'  # 왼쪽 패딩
+    tokenizer.padding_side = 'left'
 
     # 6. Dataset 변환
     remove_columns = dataset.column_names  # 기존 컬럼 모두 제거
     dataset = dataset.map(
         process,
-        batched=True,           # 배치 처리
-        num_proc=num_proc,      # 병렬 처리
-        load_from_cache_file=False,  # 캐시 사용 안 함
-        desc="Tokenizing dataset...",
+        batched=True,
+        num_proc=num_proc,  # 병렬 처리
+        load_from_cache_file=False,
+        desc="Tokenizing dataset",
         batch_size=batch_size,
-        remove_columns=remove_columns,  # 기존 컬럼 제거
+        remove_columns=remove_columns,
     )
 
     return dataset
