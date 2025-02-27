@@ -13,7 +13,7 @@ sys.path.append(f"{base_path.__str__()}/lib/")
 
 from lib.utils.data import get_dataloder_from_dataset
 from lib.utils.fetch import MultipleFetch
-from lib.utils.load_model import get_exaone
+from lib.utils.model import get_exaone
 from lib.utils.tokenize import get_tokenized_dataset
 from lib.datasets.keat_small import get_keat_small_dataset
 
@@ -22,12 +22,14 @@ PROJECT_ROOT = Path(__file__).parent.parent
 
 
 parser = argparse.ArgumentParser()
+parser.add_argument('--dataset', type=str, default='news')
+parser.add_argument('--max_length', type=int, default=128)
 parser.add_argument("--lm_name", type=str, default="exaone")
 parser.add_argument("--lm_size", type=str, default="8b")
 parser.add_argument("--lm_cache_dir", type=str, default=PROJECT_ROOT / 'cache')
 parser.add_argument("--device_map", type=str, default="auto")
+parser.add_argument('--output_dir', type=str, default='outputs')
 parser.add_argument("--batch_size", type=int, default=4)
-parser.add_argument("--split", type=str, default="train")
 parser.add_argument("--data", type=str, default="keat")
 flags = parser.parse_args()
 
@@ -130,7 +132,7 @@ dataloader = get_dataloder_from_dataset(dataset, batch_size=flags.batch_size)
 for i in range(2):
     name = "en" if i == 0 else "ko"
     pbar = tqdm(dataloader)
-    pbar.set_description(f"Processing Keat {flags.split} {name} data")
+    pbar.set_description(f"Processing Keat {name} data")
     for batch in pbar:
         # clear fetched_values
         for k in dict_format.keys():
@@ -152,13 +154,14 @@ for i in range(2):
                 dict_format["residual_q3"]["module"].fetched_values[0][i].detach().cpu()
             )
 
-os.makedirs("outputs", exist_ok=True)
+output_dir = PROJECT_ROOT / flags.output_dir
+output_dir.mkdir(parents=True, exist_ok=True)
 
 for i in range(2):
     name = "en" if i == 0 else "ko"
     with open(
-        f"outputs/activations_{flags.lm_name}_{flags.lm_size}_{flags.split}_{name}.pkl",
-        "wb",
+        output_dir / f'activations_{flags.lm_name}_{flags.lm_size}_{name}.pkl',
+        'wb',
     ) as f:
         selected_activations = {
             f"{name}_input_ids": torch.stack(activations[f"{name}_input_ids"]),

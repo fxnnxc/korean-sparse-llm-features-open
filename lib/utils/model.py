@@ -26,7 +26,6 @@ EXAONE_MODEL_SIZES_TO_LAYERS = {
 
 
 def get_exaone(
-    lm_name,
     lm_size,
     lm_cache_dir,
     device_map='auto',
@@ -38,8 +37,8 @@ def get_exaone(
 
     if return_tokenizer_only:
         tokenizer = AutoTokenizer.from_pretrained(
-            lm_name,
-            cache_dir=None if lm_cache_dir in ["none", None] else lm_cache_dir
+            name,
+            cache_dir=None if lm_cache_dir in ['none', None] else lm_cache_dir
         )
         return tokenizer
 
@@ -52,13 +51,13 @@ def get_exaone(
         name,
         torch_dtype=precision,
         trust_remote_code=True,
-        cache_dir=None if lm_cache_dir in ["none", None] else lm_cache_dir,
+        cache_dir=None if lm_cache_dir in ['none', None] else lm_cache_dir,
         device_map=device_map,
         token=os.environ['HF_TOKEN'],
     )
     tokenizer = AutoTokenizer.from_pretrained(
         name,
-        cache_dir=None if lm_cache_dir in ["none", None] else lm_cache_dir
+        cache_dir=None if lm_cache_dir in ['none', None] else lm_cache_dir
     )
     tokenizer.sep_token_id = tokenizer.eos_token_id
     tokenizer.pad_token_id = tokenizer.eos_token_id

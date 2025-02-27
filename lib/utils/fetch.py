@@ -59,7 +59,7 @@ class MultipleFetch:
             #  }
         }
         for key, value in dict_format.items():
-            fetch = GeneralFetch(value["module"], value["condition_fn"], value["fetch_fn"])
+            fetch = GeneralFetch(value['module'], value['condition_fn'], value['fetch_fn'])
             self.fetches[key] = fetch
 
     def activate(self, key=None):

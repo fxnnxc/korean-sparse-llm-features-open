@@ -17,6 +17,21 @@ Sparse Autocoder from https://github.com/ai-safety-foundation/sparse_autoencoder
   - 특징 중요도 히트맵
   - 학습 과정 모니터링
 
+## How to
+
+Gather activation vectors in intermediate layers on datasets (synthetic, news).
+
+```bash
+./x1_gather_synthetic_activations.sh
+./x2_gather_news_activations.sh
+```
+
+Train SAE on actiations.
+
+```bash
+./x3_train_sae.sh
+```
+
 ## 시각화 결과
 
 ### 특징 발견 결과
