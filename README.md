@@ -24,19 +24,19 @@ Gather activation vectors in intermediate layers on datasets (synthetic, news).
 
 ```bash
 ./x1_gather_synthetic_activations.sh
-./x2_gather_news_activations.sh
-```
-
-Train SAE for label recovery.
-
-```bash
-./x3_label_recovery.sh
+./x2_gather_keat_activations.sh
 ```
 
 Train SAE on activations.
 
 ```bash
-./x4_train_sae.sh
+./x3_train_sae.sh
+```
+
+Train label recovery from SAE features.
+
+```bash
+./x4_train_label_recovery.sh
 ```
 
 ## 시각화 결과
