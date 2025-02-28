@@ -60,9 +60,9 @@ def get_args():
 
 
 # TODO: count? isn't this float value?
-def get_feature_counts(sae, num_dictionary, activations):
+def get_feature_counts(sae, num_dict, activations):
     n_samples = len(activations)
-    feature_counts = torch.zeros(n_samples, num_dictionary)
+    feature_counts = torch.zeros(n_samples, num_dict)
     for s in tqdm(range(n_samples), "Counting features"):
         sample = activations[s].to('cuda')
         _, features = sae(sample, output_features=True)
@@ -146,7 +146,7 @@ def main(args):
                 # prepare labels
                 small_categories = list(small_category_indices.keys())
                 label2lindex = {label: lindex for lindex, label in enumerate(small_categories)}
-                lindices = [label2lindex[data['small_category']] for data in synthetic_dataset]
+                lindices = [label2lindex[row['small_category']] for row in synthetic_dataset]
                 lindices = np.array(lindices)
                 print(f"num of samples: {data.shape[0]}")
                 print(f"num of features: {data.shape[1]}")
@@ -173,8 +173,8 @@ def main(args):
                     pbar.set_description(f"[E:{epoch:5d}]")
 
                     # forward pass
-                    outputs = model(X)
-                    loss = criterion(outputs, y)
+                    logits = model(X)
+                    loss = criterion(logits, y)
 
                     # backward pass and optimize
                     optimizer.zero_grad()

@@ -39,6 +39,11 @@ Train label recovery from SAE features.
 ./x4_train_label_recovery.sh
 ```
 
+Then see notebooks.
+
+1. `notebooks/plot_label_recovery_results.ipynb'
+2. 'notebooks/plot_synthetic_feature_heatmap.ipynb'
+
 ## 시각화 결과
 
 ### 특징 발견 결과
