@@ -112,12 +112,12 @@ def main(args):
     torch.cuda.empty_cache()
 
     # for all cases
-    for label_type, category_indices in [
+    for label_type, category_indices in (
         ('small', small_category_indices),
         ('big', big_category_indices),
-    ]:
-        for depth in [2, 3]:
-            for top_k in [1, 2, 5, 10, 20, 50]:
+    ):
+        for depth in (2, 3):
+            for top_k in (1, 2, 5, 10, 20, 50):
                 print(f"Training with sae-{args.sae_version}_q{args.q} on label: {label_type}, top: {top_k}, depth: {depth}")
 
                 # resolve paths
