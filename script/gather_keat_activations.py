@@ -30,6 +30,7 @@ def get_flags():
     parser.add_argument('--device_map', type=str, default='auto')
     parser.add_argument('--output_dir', type=str, default=PROJECT_ROOT / 'outputs')
     parser.add_argument('--batch_size', type=int, default=4)
+    parser.add_argument('--inject_unsmile', action='store_true', default=False)
     flags = parser.parse_args()
     flags = OmegaConf.create(vars(flags))
     return flags
@@ -56,16 +57,16 @@ def main(flags):
 
     # activations to be recorded
     activations = {
-        'ko_input_ids': [],
-        'en_input_ids': [],
-        'ko_residual_q0': [],
-        'en_residual_q0': [],
-        'ko_residual_q1': [],
-        'en_residual_q1': [],
-        'ko_residual_q2': [],
-        'en_residual_q2': [],
-        'ko_residual_q3': [],
-        'en_residual_q3': [],
+        'keat-ko_input_ids': [],
+        'keat-en_input_ids': [],
+        'keat-ko_residual_q0': [],
+        'keat-en_residual_q0': [],
+        'keat-ko_residual_q1': [],
+        'keat-en_residual_q1': [],
+        'keat-ko_residual_q2': [],
+        'keat-en_residual_q2': [],
+        'keat-ko_residual_q3': [],
+        'keat-en_residual_q3': [],
     }
 
     # register hooks
@@ -95,32 +96,32 @@ def main(flags):
     _ = MultipleFetch(dict_format)
 
     # prepare dataset
-    dataset, _ = get_keat_dataset()
+    dataset, _ = get_keat_dataset(inject_unsmile=flags.inject_unsmile)
     dataset_target = dataset['train']
     dataset_en = get_tokenized_dataset(
         dataset_target,
         tokenizer,
         target_name='en_text',
-        output_name='en_input_ids',
+        output_name='keat-en_input_ids',
         batch_size=flags.batch_size,
         truncation=True,
         max_length=flags.max_length,
         padding='max_length',
     )
-    dataset_en = dataset_en.rename_columns({'attention_mask': 'en_attention_mask'})
+    dataset_en = dataset_en.rename_columns({'attention_mask': 'keat-en_attention_mask'})
     dataset_ko = get_tokenized_dataset(
         dataset_target,
         tokenizer,
         target_name='ko_text',
-        output_name='ko_input_ids',
+        output_name='keat-ko_input_ids',
         batch_size=flags.batch_size,
         truncation=True,
         max_length=flags.max_length,
         padding='max_length',
     )
-    dataset_ko = dataset_ko.rename_columns({'attention_mask': 'ko_attention_mask'})
-    dataset = dataset_en.add_column('ko_input_ids', dataset_ko['ko_input_ids'])
-    dataset = dataset.add_column('ko_attention_mask', dataset_ko['ko_attention_mask'])
+    dataset_ko = dataset_ko.rename_columns({'attention_mask': 'keat-ko_attention_mask'})
+    dataset = dataset_en.add_column('keat-ko_input_ids', dataset_ko['keat-ko_input_ids'])
+    dataset = dataset.add_column('keat-ko_attention_mask', dataset_ko['keat-ko_attention_mask'])
     dataloader = get_dataloder_from_dataset(dataset, batch_size=flags.batch_size)
 
     # fetch and save activations
