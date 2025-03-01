@@ -1,6 +1,7 @@
 # !/bin/bash
 
-SAE_VERSIONS=("gated")  # ("standard" "gated" "gated_anneal" "standard_anneal")
+# SAE_VERSIONS=("standard" "gated")  # ("standard" "gated" "gated_anneal" "standard_anneal")
+SAE_VERSIONS=("standard")
 
 for SAE_VERSION in "${SAE_VERSIONS[@]}"; do
     for Q in "2" "3"; do

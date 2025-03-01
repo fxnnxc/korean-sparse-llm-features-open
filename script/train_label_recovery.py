@@ -60,6 +60,7 @@ def get_args():
 
 
 # TODO: count? isn't this float value?
+# anyway, sum because time domain (mean of word-level activations)
 def get_feature_counts(sae, num_dict, activations):
     n_samples = len(activations)
     feature_counts = torch.zeros(n_samples, num_dict)

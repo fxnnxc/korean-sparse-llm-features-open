@@ -41,16 +41,29 @@ Train label recovery from SAE features.
 
 Then see notebooks.
 
-1. `notebooks/plot_label_recovery_results.ipynb'
-2. 'notebooks/plot_synthetic_feature_heatmap.ipynb'
+1. `notebooks/x5_plot_label_recovery_results.ipynb`
+2. `notebooks/x6_plot_sae_train_loss.ipynb`
+3. `notebooks/x7_plot_synthetic_feature_heatmap.ipynb`
+4. `notebooks/x8_visualize_topk_features_with_category.ipynb`
 
 ## 시각화 결과
 
 ### 특징 발견 결과
 
-<img src="assets/discovery_results.png">
+<img src="assets/top-2_small-category_features.png">
 
-위 그래프는 Sparse Autoencoder를 통해 발견된 주요 특징들의 분포를 보여줍니다. 각 점은 개별 특징을 나타내며, 군집화된 패턴을 통해 유사한 특징들의 그룹을 확인할 수 있습니다.
+위 히트맵은 Sparse Autoencoder를 통해 발견된 주요 특징들의 분포를 보여줍니다. 각 점은 개별 특징을 나타내며, 군집화된 패턴을 통해 유사한 특징들의 그룹을 확인할 수 있습니다.
+
+### Probing
+
+<img src="assets/label_recovery_results.png">
+
+SAE의 feature만 가지고 category 분류를 시도해보는것으로 해당 feature가 얼마나 정보를 잘 담고 있는지를 파악할 수 있습니다.
+
+* Standard SAE보다는 Gated SAE가 더 잘 담고 있습니다.
+* feature를 1개만 쓰는 극단적인 경우가 아니라면, 중간 정도 레이어가 뒤쪽 레이어보다 카테고리 분류에 필요한 정보가 더 잘 반영되어있습니다.
+* 세분화된 카테고리를 맞추는게 조금 더 쉽습니다.
+* probing용 분류기는 레이어 2짜리보다 3짜리가 좀 더 좋습니다.
 
 ### 학습 성능 분석
 
@@ -60,14 +73,14 @@ Then see notebooks.
 
 위 그래프들은 모델의 학습 과정을 보여줍니다:
 
-- 상단 그래프: 언어별 손실 함수와 희소성(sparsity) 변화 추이
-- 하단 그래프: 특징 활성화의 분위수 분포 변화
+- 상단 그래프: 언어별 손실 함수와 희소성(sparsity) 변화 추이 (현재는 한국어만)
+- 하단 그래프: 특징 활성화 추출 레이어의 분위수에 따른 성능 차이 (중간 vs 뒤쪽)
 
 ### 문서 임베딩 시각화
 
-<img src="assets/exaone_8b_train_ko_gated_q2_topk10_umap.png">
+<img src="assets/keat-ko_sae-gated_q2_top-10_umap.png">
 
-<img src="assets/exaone_8b_train_ko_standard_q2_topk100_umap.png">
+<img src="assets/keat-ko_sae-standard_q2_top-100_umap.png">
 
 UMAP을 사용한 문서 임베딩 시각화:
 
@@ -76,10 +89,10 @@ UMAP을 사용한 문서 임베딩 시각화:
 
 ### 특징 중요도 분석
 
-<img src="assets/exaone_8b_train_ko_gated_q2_topk50_feature_counts.png">
+<img src="assets/keat-ko_sae-gated_q2_top-50_feature_counts.png">
 
 특징 활성화 빈도 분석:
 
-- x축: 특징 ID
+- x축: 특징 ID (정렬된 상태)
 - y축: 활성화 빈도
 - 상위 50개 특징의 상대적 중요도를 보여줌

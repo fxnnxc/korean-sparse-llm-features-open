@@ -46,12 +46,12 @@ def get_keat_dataset():
         json_path = data_dir / filename
         with open(json_path) as fpi:
             json_data = json.load(fpi)
-        for item in json_data:
-            samples = item['text']
+        for row in json_data:
+            samples = row['text']
             for sample in samples:
                 data[name]['en_text'].append(sample['en_text'])
                 data[name]['ko_text'].append(sample['ko_text'])
-                data[name]['categories'].append(item['category'])
+                data[name]['categories'].append(row['category'])
 
     # convert to datasets
     for target, key2rows in data.items():
@@ -163,7 +163,7 @@ def download_and_install_noto_font(test=True):
     # update font cache on Linux
     if platform_system == 'Linux':
         try:
-            subprocess.run(['fc-cache', '-f', '-v'], check=True)
+            subprocess.run(['fc-cache', '-f'], check=True)
         except subprocess.CalledProcessError:
             print("Warning: Failed to update font cache. Font might not be immediately available.")
 
